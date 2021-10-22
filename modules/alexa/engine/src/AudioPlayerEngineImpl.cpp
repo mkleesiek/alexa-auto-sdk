@@ -64,8 +64,17 @@ bool AudioPlayerEngineImpl::initialize(
         // temporary
         std::vector<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface>>
             audioChannelVolumeInterfaces{getChannelVolumeInterface()};
+
+        // experimental fingerprint, required for Premium Audio allowlisting
+        // @see https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/audioplayer.html#capability-assertion
+        alexaClientSDK::avsCommon::utils::mediaPlayer::Fingerprint fingerprint = {
+            .package = "com.amazon.music.auto.premium.poc",
+            .buildType = "EXPERIMENTAL",
+            .versionNumber = "1"
+        };
+
         auto provider = alexaClientSDK::avsCommon::utils::mediaPlayer::PooledMediaResourceProvider::
-            createPooledMediaResourceProviderInterface({shared_from_this()}, audioChannelVolumeInterfaces);
+            createPooledMediaResourceProviderInterface({shared_from_this()}, audioChannelVolumeInterfaces, fingerprint);
 
         // create the capability agent
         m_audioPlayerCapabilityAgent = alexaClientSDK::acsdkAudioPlayer::AudioPlayer::create(
